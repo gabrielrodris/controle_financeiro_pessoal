@@ -13,7 +13,7 @@ API RESTful para gerenciamento de finanças pessoais, permitindo criar, listar e
 ## Configuração
 1. **Clonar o Repositório**:
    ```bash
-   git clone https://github.com/gabrielrodris/gabriel_portifolio.git
+   git clone https://github.com/gabrielrodris/controle_financeiro_pessoal.git
    cd gabriel_portifolio
    ```
 
