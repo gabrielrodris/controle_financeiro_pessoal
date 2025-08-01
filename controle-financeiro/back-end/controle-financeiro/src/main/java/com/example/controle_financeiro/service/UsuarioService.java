@@ -67,7 +67,6 @@ public class UsuarioService {
         Optional.ofNullable(dto.getSenha())
                 .filter(senha -> !senha.isBlank())
                 .ifPresent(senha -> {
-                    // Hash the new password using BCrypt
                     String hashedPassword = BCrypt.withDefaults().hashToString(12, senha.toCharArray());
                     usuario.setSenha(hashedPassword);
                 });
