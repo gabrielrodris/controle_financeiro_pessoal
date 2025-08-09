@@ -1,95 +1,92 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Alert } from 'react-bootstrap';
+import { getTransactionsByUserAndCategory, getFinancialGoals } from '../lib/api';
+
+export default function Dashboard() {
+  const [transacoes, setTransacoes] = useState([]);
+  const [metas, setMetas] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const transacoesData = await getTransactionsByUserAndCategory(1, 1);
+        const metasData = await getFinancialGoals(1);
+        setTransacoes(transacoesData);
+        setMetas(metasData);
+        setError(null);
+      } catch (err) {
+        setError('Erro ao carregar dados. Verifique a conexão com o servidor.');
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    <Container className="mt-4">
+      <h1>Dashboard</h1>
+      {error && <Alert variant="danger">{error}</Alert>}
+      <Row>
+        <Col md={4}>
+          <Card className="mb-4">
+            <Card.Body>
+              <Card.Title>Saldo Total</Card.Title>
+              <Card.Text>
+                Entradas: R$ {transacoes.reduce((sum, t) => t.tipo === 'ENTRADA' ? sum + t.valor : sum, 0).toFixed(2)} <br />
+                Saídas: R$ {transacoes.reduce((sum, t) => t.tipo === 'SAIDA' ? sum + t.valor : sum, 0).toFixed(2)} <br />
+                Saldo: R$ {(transacoes.reduce((sum, t) => t.tipo === 'ENTRADA' ? sum + t.valor : sum - t.valor, 0)).toFixed(2)}
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={8}>
+          <Card className="mb-4">
+            <Card.Body>
+              <Card.Title>Metas Financeiras</Card.Title>
+              {metas.map(meta => (
+                <div key={meta.id} className="mb-2">
+                  <strong>{meta.nome}</strong>: R$ {meta.valorObjetivo.toFixed(2)} até {meta.dataLimite}
+                </div>
+              ))}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <Card>
+            <Card.Body>
+              <Card.Title>Transações Recentes</Card.Title>
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Categoria</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transacoes.slice(0, 5).map(t => (
+                    <tr key={t.id}>
+                      <td>{t.id}</td>
+                      <td>{t.descricao}</td>
+                      <td>R$ {t.valor.toFixed(2)}</td>
+                      <td>{t.data}</td>
+                      <td>{t.tipo}</td>
+                      <td>{t.categoriaNome}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }
