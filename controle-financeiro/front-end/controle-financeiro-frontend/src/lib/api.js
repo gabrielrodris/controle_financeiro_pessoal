@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: 'http://192.168.1.161:8081', // IP do PC e porta 8080
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,11 +23,11 @@ export const getCategories = async () => {
 };
 
 export const getFinancialGoals = async (usuarioId) => {
-  const response = await api.get(`/metas-financeiras/usuario/${usuarioId}`);
+  const response = await api.get(`/metaFinanceiras/usuario/${usuarioId}`);
   return response.data;
 };
 
 export const createFinancialGoal = async (data) => {
-  const response = await api.post('/metas-financeiras', data);
+  const response = await api.post('/metaFinanceiras', data);
   return response.data;
 };
