@@ -82,10 +82,10 @@ API RESTful para gerenciamento de finanças pessoais, permitindo criar, listar e
    mvn clean install
    mvn spring-boot:run
    ```
-   - Acesse em `http://localhost:8080`.
+   - Acesse em `http://localhost:8081`.
 
 4. **Testar com Swagger**:
-   - Abra `http://localhost:8080/swagger-ui.html` para testar os endpoints.
+   - Abra `http://localhost:8081/swagger-ui.html` para testar os endpoints.
 
 ## Endpoints Principais
 - **POST /transacoes**: Criar transação
