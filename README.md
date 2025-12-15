@@ -21,6 +21,52 @@ API RESTful para gerenciamento de finanças pessoais, permitindo criar, listar e
    - Crie um banco MySQL:
      ```sql
      CREATE DATABASE controle_financeiro;
+
+     CREATE TABLE usuario (
+       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+       nome VARCHAR(255) NOT NULL,
+       email VARCHAR(255) NOT NULL UNIQUE,
+       senha VARCHAR(255) NOT NULL,
+       data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE categoria (
+       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+       nome VARCHAR(255) NOT NULL,
+       tipo_transacao VARCHAR(50) NOT NULL
+      );
+
+      CREATE TABLE meta_financeira (
+       id  BIGINT AUTO_INCREMENT PRIMARY KEY,
+       nome VARCHAR(255) NOT NULL,
+       valor_objetivo DECIMAL(19,2) NOT NULL,
+       data_limite DATE NOT NULL,
+       usuario_id BIGINT NOT NULL,
+       CONSTRAINT fk_meta_financeira_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuario(id)
+        ON DELETE CASCADE
+      );
+
+      CREATE TABLE transacao (
+       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+       descricao VARCHAR(255) NOT NULL,
+       valor DECIMAL(19,2) NOT NULL,
+       data DATE NOT NULL,
+       tipo VARCHAR(50) NOT NULL,
+
+       usuario_id BIGINT NOT NULL,
+       categoria_id BIGINT NOT NULL,
+
+       CONSTRAINT fk_transacao_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuario(id)
+        ON DELETE CASCADE,
+
+       CONSTRAINT fk_transacao_categoria
+        FOREIGN KEY (categoria_id)
+        REFERENCES categoria(id)
+      );
      ```
    - Edite `src/main/resources/application.properties`:
      ```properties
