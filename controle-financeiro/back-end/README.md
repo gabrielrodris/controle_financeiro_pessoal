@@ -20,7 +20,9 @@ API RESTful para gerenciamento de finanças pessoais, permitindo criar, listar e
 2. **Configurar o Banco de Dados**:
    - Crie um banco MySQL:
      ```sql
-     CREATE DATABASE controle_financeiro;
+     CREATE DATABASE if not exists controle_financeiro;
+
+     use controle_financeiro;
 
      CREATE TABLE usuario (
        id BIGINT AUTO_INCREMENT PRIMARY KEY,
