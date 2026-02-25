@@ -1,6 +1,6 @@
 package com.example.controle_financeiro.service;
 
-import com.example.controle_financeiro.dto.LoginDTO;
+import com.example.controle_financeiro.dto.LoginRequestDTO;
 import com.example.controle_financeiro.dto.UsuarioRequestDTO;
 import com.example.controle_financeiro.dto.UsuarioResponseDTO;
 import com.example.controle_financeiro.entity.Usuario;
@@ -38,12 +38,12 @@ public class AuthService {
         return new UsuarioResponseDTO(usuario);
     }
 
-    public UsuarioResponseDTO login(LoginDTO dto) {
+    public UsuarioResponseDTO login(LoginRequestDTO dto) {
 
-        Usuario usuario = repository.findByEmail(dto.email())
+        Usuario usuario = repository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        if (!encoder.matches(dto.senha(), usuario.getSenha())) {
+        if (!encoder.matches(dto.getSenha(), usuario.getSenha())) {
             throw new IllegalArgumentException("Senha inválida");
         }
 

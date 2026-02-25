@@ -5,6 +5,7 @@ import com.example.controle_financeiro.dto.UsuarioRequestDTO;
 import com.example.controle_financeiro.dto.UsuarioResponseDTO;
 import com.example.controle_financeiro.service.UsuarioService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody UsuarioRequestDTO dto) {
+    public ResponseEntity<?> create(@RequestBody @Valid UsuarioRequestDTO dto) {
         try {
             UsuarioResponseDTO response = usuarioService.create(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -39,9 +40,13 @@ public class UsuarioController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<List<UsuarioResponseDTO>> getByEmail(@RequestParam String email) {
-        List<UsuarioResponseDTO> usuarios = usuarioService.getByEmail(email);
-        return ResponseEntity.ok(usuarios);
+    public ResponseEntity<UsuarioResponseDTO> getByEmail(@RequestParam String email) {
+        try {
+            UsuarioResponseDTO usuario = usuarioService.getByEmail(email);
+            return ResponseEntity.ok(usuario);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping

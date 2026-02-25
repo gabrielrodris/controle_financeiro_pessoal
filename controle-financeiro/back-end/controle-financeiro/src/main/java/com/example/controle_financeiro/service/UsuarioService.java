@@ -1,15 +1,14 @@
 package com.example.controle_financeiro.service;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.example.controle_financeiro.dto.LoginRequestDTO;
+import com.example.controle_financeiro.dto.LoginResponseDTO;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.controle_financeiro.dto.UsuarioRequestDTO;
 import com.example.controle_financeiro.dto.UsuarioResponseDTO;
 import com.example.controle_financeiro.entity.Usuario;
 import com.example.controle_financeiro.repository.UsuarioRepo;
-
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +18,13 @@ import java.util.Optional;
 @Service
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepo usuarioRepo;
+    private final UsuarioRepo usuarioRepo;
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuarioService(UsuarioRepo usuarioRepo, PasswordEncoder passwordEncoder) {
+        this.usuarioRepo = usuarioRepo;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     @Transactional
@@ -28,9 +32,11 @@ public class UsuarioService {
         if (usuarioRepo.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("Email já registrado");
         }
+
         Usuario usuario = dto.toEntity();
-        String hashedPassword = BCrypt.withDefaults().hashToString(12, dto.getSenha().toCharArray());
-        usuario.setSenha(hashedPassword);
+
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+
         return UsuarioResponseDTO.fromEntity(usuarioRepo.save(usuario));
     }
 
@@ -41,10 +47,11 @@ public class UsuarioService {
     }
 
 
-    public List<UsuarioResponseDTO> getByEmail(String email){
-        return usuarioRepo.findByEmail(email)
-                .stream().map(UsuarioResponseDTO::fromEntity)
-                .toList();
+    public UsuarioResponseDTO getByEmail(String email){
+        Usuario usuario = usuarioRepo.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        return new UsuarioResponseDTO(usuario);
     }
 
 
@@ -66,10 +73,9 @@ public class UsuarioService {
         usuario.setEmail(dto.getEmail());
         Optional.ofNullable(dto.getSenha())
                 .filter(senha -> !senha.isBlank())
-                .ifPresent(senha -> {
-                    String hashedPassword = BCrypt.withDefaults().hashToString(12, senha.toCharArray());
-                    usuario.setSenha(hashedPassword);
-                });
+                .ifPresent(senha ->
+                        usuario.setSenha(passwordEncoder.encode(senha))
+                );
         return UsuarioResponseDTO.fromEntity(usuarioRepo.save(usuario));
     }
 
@@ -79,5 +85,17 @@ public class UsuarioService {
             throw new EntityNotFoundException("Usuário não encontrado");
         }
         usuarioRepo.deleteById(id);
+    }
+
+    public LoginResponseDTO login(LoginRequestDTO dto) {
+
+        Usuario usuario = usuarioRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        if (!passwordEncoder.matches(dto.getSenha(), usuario.getSenha())) {
+            throw new IllegalArgumentException("Senha inválida");
+        }
+
+        return new LoginResponseDTO("Login realizado com sucesso");
     }
 }

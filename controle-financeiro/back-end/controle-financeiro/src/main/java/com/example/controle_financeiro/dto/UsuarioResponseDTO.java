@@ -19,4 +19,8 @@ public class UsuarioResponseDTO {
         this.email = usuario.getEmail();
         this.dataCadastro = usuario.getDataCadastro();
     }
+
+    public static UsuarioResponseDTO fromEntity(Usuario usuario) {
+        return new UsuarioResponseDTO(usuario);
+    }
 }
