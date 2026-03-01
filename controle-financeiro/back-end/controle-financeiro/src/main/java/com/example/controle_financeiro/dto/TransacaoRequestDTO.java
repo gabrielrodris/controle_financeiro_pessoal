@@ -18,6 +18,7 @@ public class TransacaoRequestDTO {
 
     @NotNull(message = "Valor é obrigatório")
     @Positive(message = "Valor deve ser positivo")
+    @DecimalMin(value = "0.01", message = "Valor deve ser maior que zero")
     private BigDecimal valor;
 
     @NotNull(message = "Data é obrigatória")
@@ -33,15 +34,6 @@ public class TransacaoRequestDTO {
     @NotNull(message = "Categoria é obrigatória")
     private Long categoriaId;
 
-    public TransacaoRequestDTO(String descricao, BigDecimal valor, TipoTransacao tipo,
-                               Long usuarioId, Long categoriaId) {
-        this.descricao = descricao;
-        this.valor = valor;
-        this.data = LocalDate.now();
-        this.tipo = tipo;
-        this.usuarioId = usuarioId;
-        this.categoriaId = categoriaId;
-    }
 
     public Transacao toEntity(Usuario usuario, Categoria categoria) {
         Transacao transacao = new Transacao();

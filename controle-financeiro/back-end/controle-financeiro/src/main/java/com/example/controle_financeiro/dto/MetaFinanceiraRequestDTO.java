@@ -17,6 +17,7 @@ public class MetaFinanceiraRequestDTO {
 
     @NotNull(message = "Valor objetivo é obrigatório")
     @Positive(message = "Valor objetivo deve ser positivo")
+    @DecimalMin(value = "0.01", message = "Valor objetivo deve ser maior que zero")
     private BigDecimal valorObjetivo;
 
     @NotNull(message = "Data limite é obrigatória")
@@ -26,20 +27,6 @@ public class MetaFinanceiraRequestDTO {
     @NotNull(message = "Usuário é obrigatório")
     private Long usuarioId;
 
-    public MetaFinanceiraRequestDTO(String nome, BigDecimal valorObjetivo, Long usuarioId) {
-        this.nome = nome;
-        this.valorObjetivo = valorObjetivo;
-        this.usuarioId = usuarioId;
-    }
-
-//    public MetaFinanceira toEntity(Usuario usuario){
-//        return new MetaFinanceira(
-//                this.nome,
-//                this.valorObjetivo,
-//                this.dataLimite,
-//                usuario
-//        );
-//    }
 
     public MetaFinanceira toEntity(Usuario usuario){
         MetaFinanceira meta = new MetaFinanceira();

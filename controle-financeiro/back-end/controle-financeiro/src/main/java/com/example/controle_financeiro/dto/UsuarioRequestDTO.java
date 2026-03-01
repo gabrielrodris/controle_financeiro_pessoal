@@ -10,15 +10,15 @@ import lombok.Data;
 public class UsuarioRequestDTO {
 
     @NotBlank(message = "Nome é obrigatório")
-    @Size(min = 2, max = 100)
+    @Size(min = 2, max = 100, message = "Nome deve ter entr 2 e 100 caracteres")
     private String nome;
 
     @NotBlank(message = "Email é obrigatório")
-    @Email
+    @Email(message = "Email inválido")
     private String email;
 
     @NotBlank(message = "Senha é obrigatória")
-    @Size(min = 6, max = 100)
+    @Size(min = 6, max = 100, message = "Senha deve ter entre 6 e 100 caracteres")
     private String senha;
 
     public Usuario toEntity() {

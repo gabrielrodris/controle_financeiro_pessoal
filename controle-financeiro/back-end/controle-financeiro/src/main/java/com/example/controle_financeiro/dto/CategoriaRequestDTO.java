@@ -2,6 +2,9 @@ package com.example.controle_financeiro.dto;
 
 import com.example.controle_financeiro.entity.Categoria;
 import com.example.controle_financeiro.enums.TipoTransacao;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,27 +18,11 @@ public class CategoriaRequestDTO {
     private String nome;
 
     @NotNull(message = "Tipo é obrigatório")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_transacao")
     private TipoTransacao tipo;
 
-    public CategoriaRequestDTO(String nome){
-        this.nome = nome;
-    }
 
-    public TipoTransacao getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoTransacao tipo) {
-        this.tipo = tipo;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
 
     public Categoria toEntity(){
         Categoria categoria = new Categoria();
