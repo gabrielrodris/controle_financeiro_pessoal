@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,8 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid UsuarioRequestDTO dto) {
@@ -49,8 +53,23 @@ public class UsuarioController {
         }
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> getMe(){
+
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
+        UsuarioResponseDTO usuario = usuarioService.getByEmail(email);
+
+        return ResponseEntity.ok(usuario);
+    }
+
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> getAll() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        System.out.println("Usuario logado: " + email);
         List<UsuarioResponseDTO> usuarios = usuarioService.getAll();
         return ResponseEntity.ok(usuarios);
     }

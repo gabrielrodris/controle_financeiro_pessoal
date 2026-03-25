@@ -21,6 +21,11 @@ public class Categoria {
     @Column(name = "tipo_transacao",nullable = false)
     private TipoTransacao tipo;
 
+    //relacionamento
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
 
     public Categoria(String nome, TipoTransacao tipo) {
     }

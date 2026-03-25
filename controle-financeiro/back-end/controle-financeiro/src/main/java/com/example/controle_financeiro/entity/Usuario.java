@@ -34,6 +34,10 @@ public class Usuario implements UserDetails {
     @Column(name = "data_cadastro", nullable = false, updatable = false)
     private LocalDateTime dataCadastro;
 
+    //relacionamento
+    @ManyToMany(mappedBy = "usuario")
+    private List<Categoria> categorias;
+
 
     // Autoridades
     @Override
