@@ -35,7 +35,7 @@ public class Usuario implements UserDetails {
     private LocalDateTime dataCadastro;
 
     //relacionamento
-    @ManyToMany(mappedBy = "usuario")
+    @OneToMany(mappedBy = "usuario")
     private List<Categoria> categorias;
 
 

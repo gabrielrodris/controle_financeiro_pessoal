@@ -1,12 +1,17 @@
 package com.example.controle_financeiro.controller;
 
+import com.example.controle_financeiro.entity.Categoria;
+import com.example.controle_financeiro.entity.Usuario;
 import com.example.controle_financeiro.enums.TipoTransacao;
 import com.example.controle_financeiro.errorMessage.ErrorResponse;
 import com.example.controle_financeiro.dto.CategoriaRequestDTO;
 import com.example.controle_financeiro.dto.CategoriaResponseDTO;
+import com.example.controle_financeiro.repository.CategoriaRepo;
+import com.example.controle_financeiro.repository.UsuarioRepo;
 import com.example.controle_financeiro.service.CategoriaService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,19 +23,24 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/categorias")
+@RequiredArgsConstructor
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaService categoriaService;
+
+    private final CategoriaService categoriaService;
+
 
     @PostMapping
-    public ResponseEntity<CategoriaResponseDTO> create(@Valid @RequestBody CategoriaRequestDTO categoriaRequestDTO){
-        try{
-            CategoriaResponseDTO categoriaReponse = categoriaService.create(categoriaRequestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(categoriaReponse);
-        }catch (IllegalArgumentException erro){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<CategoriaResponseDTO> create(@RequestBody CategoriaRequestDTO dto) {
+
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        CategoriaResponseDTO response = categoriaService.create(dto, email);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
@@ -42,12 +52,12 @@ public class CategoriaController {
 
     @GetMapping
     public ResponseEntity<List<CategoriaResponseDTO>> getAll() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication().getName();
 
+        List<CategoriaResponseDTO> categorias = categoriaService.getAll(email);
 
-
-        List<CategoriaResponseDTO> categorias = categoriaService.getAll();
         return ResponseEntity.ok(categorias);
     }
 

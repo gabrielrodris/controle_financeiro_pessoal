@@ -19,6 +19,9 @@ public class CategoriaResponseDTO {
         this.nome = nome;
     }
 
+    public CategoriaResponseDTO(Categoria categoria) {
+    }
+
     public static CategoriaResponseDTO fromEntity(Categoria categoria) {
         return new CategoriaResponseDTO(
                 categoria.getId(),

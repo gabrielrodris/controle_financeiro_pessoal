@@ -9,6 +9,7 @@ import com.example.controle_financeiro.enums.TipoTransacao;
 import com.example.controle_financeiro.repository.CategoriaRepo;
 import com.example.controle_financeiro.repository.UsuarioRepo;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +18,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @Service
 public class CategoriaService {
 
-    @Autowired
-    private CategoriaRepo categoriaRepo;
-    private UsuarioRepo usuarioRepo;
+
+    private final CategoriaRepo categoriaRepo;
+    private final UsuarioRepo usuarioRepo;
 
     @Transactional
-    public CategoriaResponseDTO create(CategoriaRequestDTO dto) {
+    public CategoriaResponseDTO create(CategoriaRequestDTO dto, String email) {
+
         if (categoriaRepo.existsByNomeAndTipo(dto.getNome(), dto.getTipo())) {
             throw new IllegalArgumentException("Categoria com mesmo nome e tipo já registrada");
         }
+
+        Usuario usuario = usuarioRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
         Categoria categoria = dto.toEntity();
-        return CategoriaResponseDTO.fromEntity(categoriaRepo.save(categoria));
+        categoria.setUsuario(usuario);
+
+        Categoria salva = categoriaRepo.save(categoria);
+
+        return CategoriaResponseDTO.fromEntity(salva);
     }
 
     public Optional<CategoriaResponseDTO> getById(Long id) {
@@ -47,9 +57,13 @@ public class CategoriaService {
         return new UsuarioResponseDTO(usuario);
     }
 
-    public List<CategoriaResponseDTO> getAll() {
-        return categoriaRepo.findAll().stream()
-                .map(CategoriaResponseDTO::fromEntity)
+    public List<CategoriaResponseDTO> getAll(String email) {
+        Usuario usuario = usuarioRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return categoriaRepo.findByUsuario(usuario)
+                .stream()
+                .map(CategoriaResponseDTO::new)
                 .toList();
     }
 
